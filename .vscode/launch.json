@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "cortex-debug",
+      "request": "launch",
+      "name": "remote-openocd",
+      "servertype": "external",
+      "cwd": "${workspaceRoot}",
+      "preLaunchTask": "${defaultBuildTask}",
+      "executable": "${workspaceFolder}/target/thumbv6m-none-eabi/debug/firmware",
+      "gdbPath": "arm-none-eabi-gdb",
+      "device": "RP2040",
+      "gdbTarget": "debugsrv.keziah.de:3333",
+      "svdFile": "${workspaceRoot}/.vscode/rp2040.svd",
+      "internalConsoleOptions": "openOnSessionStart",
+      "runToEntryPoint": "main",
+      "preLaunchCommands": [
+        "monitor arm semihosting enable",
+        "monitor arm semihosting_fileio enable"
+      ],
+      "postRestartCommands": [
+        "break main",
+        "continue"
+      ]
+    },
+  ]
+}

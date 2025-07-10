@@ -1,0 +1,5 @@
+services:
+  mosquitto:
+    build: .
+    ports:
+      - 1883:1883

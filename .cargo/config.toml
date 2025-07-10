@@ -1,0 +1,10 @@
+[build]
+target = "thumbv6m-none-eabi"
+
+[target.thumbv6m-none-eabi]
+rustflags = [
+    "-C", "linker=flip-link",
+    "-C", "link-arg=--nmagic",
+    "-C", "link-arg=-Tlink.x",
+    "-C", "no-vectorize-loops",
+]
