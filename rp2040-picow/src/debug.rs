@@ -11,14 +11,14 @@ macro_rules! debug_println {
     ($s:expr) => {{
         if cfg!(debug_assertions) {
             // Print via semihosting
-            // Note: This crashes if no debugger is attached
+            // Note: This will crash if no debugger is attached
             cortex_m_semihosting::hprintln!($s);
         }
     }};
     ($s:expr, $($tt:tt)*) => {{
         if cfg!(debug_assertions) {
             // Print via semihosting
-            // Note: This crashes if no debugger is attached
+            // Note: This will crash if no debugger is attached
             cortex_m_semihosting::hprintln!($s, $($tt)*);
         }
     }};
@@ -70,7 +70,7 @@ impl StatusLedSession {
     }
 }
 
-/// [`Cyw43Session`] network task
+/// [`StatusLed`] task
 #[embassy_executor::task]
 async fn status_led_task(mode: &'static AtomicU8, radio: &'static Cyw43Session) {
     /// Toggle interval for LED blinking

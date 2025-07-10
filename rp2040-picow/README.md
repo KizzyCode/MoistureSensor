@@ -20,8 +20,8 @@ You will need the following prerequisites:
 - A suitable **release** image. You can fetch the latest release from
   <https://github.com/KizzyCode/MoistureSensor/releases>, or build the release yourself.
 
-  **Important**: Make sure to fetch or build a _release_ image, not a debug image – the debug images will not work as
-  they will crash if there is no debugger attached.
+  **Important**: Make sure to fetch or build a _release image_, not a debug image – the debug images will not work for 
+  normal operation, as they will crash if there is no debugger attached.
 - The [Raspberry Pi `picotool`](https://github.com/raspberrypi/picotool), to flash the image and configuration.
 - The targeted Raspberry Pi Pico in `BOOTSEL`-mode connected via USB.
 
