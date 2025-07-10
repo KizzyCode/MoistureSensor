@@ -2,20 +2,13 @@
 build: false
 
 
-# The Rust target platforms
-platform:
-  - rp2040-picow
-
-
-# The Rust config matrix
-configuration:
-  - --features=
-
-
 # General environment vars
 environment:
-  # Promote warnings to errors
   RUSTFLAGS: -D warnings
+  APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
+  matrix:
+    - FIRMWARE: rp2040-picow
+      TARGET: thumbv6m-none-eabi
 
 
 # Fail fast if one job in the matrix fails
@@ -23,20 +16,15 @@ matrix:
   fast_finish: true
 
 
-# Build library
+# Build app
 for:
-  # - matrix:
-  #     only:
-  #       - platform: rp2040-picow
-  - environment:
-      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
-      RUST_TARGET: thumbv6m-none-eabi
-    install:
+  - install:
       - curl https://sh.rustup.rs -sSf -o rustup-init.sh
       - sh rustup-init.sh -y --default-host x86_64-unknown-linux-gnu
       - source $HOME/.cargo/env
-      - rustup target add "$RUST_TARGET"
+      - rustup target add "$TARGET"
     test_script:
       # Only build as we do not emulate the microcontroller to really run the code
-      - cd "$PLATFORM" && cargo build --verbose --no-default-features $CONFIGURATION
-      - cd "$PLATFORM" && cargo build --verbose --release --no-default-features $CONFIGURATION
+      - cd "$FIRMWARE" 
+      - cargo build --verbose
+      - cargo build --verbose --release
