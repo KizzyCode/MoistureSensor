@@ -37,6 +37,5 @@ for:
       - rustup target add thumbv6m-none-eabi
     test_script:
       # Only build as we do not emulate the microcontroller to really run the code
-      - cd "$PLATFORM"
-      - cargo build --verbose --no-default-features $CONFIGURATION
-      - cargo build --verbose --release --no-default-features $CONFIGURATION
+      - cd "$PLATFORM" && cargo build --verbose --no-default-features $CONFIGURATION
+      - cd "$PLATFORM" && cargo build --verbose --release --no-default-features $CONFIGURATION
