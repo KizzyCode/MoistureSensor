@@ -1,9 +1,5 @@
 [![License BSD-2-Clause](https://img.shields.io/badge/License-BSD--2--Clause-blue.svg)](https://opensource.org/licenses/BSD-2-Clause)
 [![License MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![docs.rs](https://docs.rs/moisturesensor-rp2040-picow/badge.svg)](https://docs.rs/moisturesensor-rp2040-picow)
-[![crates.io](https://img.shields.io/crates/v/moisturesensor-rp2040-picow.svg)](https://crates.io/crates/moisturesensor-rp2040-picow)
-[![Download numbers](https://img.shields.io/crates/d/moisturesensor-rp2040-picow.svg)](https://crates.io/crates/moisturesensor-rp2040-picow)
-[![dependency status](https://deps.rs/crate/moisturesensor-rp2040-picow/latest/status.svg)](https://deps.rs/crate/moisturesensor-rp2040-picow)
 
 
 # `moisturesensor-rp2040-picow`
