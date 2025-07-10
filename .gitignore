@@ -3,8 +3,8 @@
 /Icon?
 
 # Ignore build results
-/Cargo.lock
-/target
+/*/Cargo.lock
+/*/target
 
 # Ignore some vscode files
 .vscode/*

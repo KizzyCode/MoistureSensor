@@ -1,41 +1,14 @@
 [![License BSD-2-Clause](https://img.shields.io/badge/License-BSD--2--Clause-blue.svg)](https://opensource.org/licenses/BSD-2-Clause)
 [![License MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![docs.rs](https://docs.rs/moisturesensor-rp2040-picow/badge.svg)](https://docs.rs/moisturesensor-rp2040-picow)
-[![crates.io](https://img.shields.io/crates/v/moisturesensor-rp2040-picow.svg)](https://crates.io/crates/moisturesensor-rp2040-picow)
-[![Download numbers](https://img.shields.io/crates/d/moisturesensor-rp2040-picow.svg)](https://crates.io/crates/moisturesensor-rp2040-picow)
-[![dependency status](https://deps.rs/crate/moisturesensor-rp2040-picow/latest/status.svg)](https://deps.rs/crate/moisturesensor-rp2040-picow)
 
 
-# `moisturesensor-rp2040-picow`
-Welcome to `moisturesensor-rp2040-picow` 🎉
+# `moisturesensor`
+Welcome to `moisturesensor` 🎉
 
-This firmware is a Raspberry Pi Pico W application that can read data from a capacitive moisture sensor connected via
-the analogue pin, and publishes them via MQTT.
+This repository provides firmware applications that can read data from a capacitive moisture sensor connected via the
+analogue pin, and publishes them via MQTT.
 
 
-## Config
-The sensor needs a network and MQTT configuration, which has to be deployed independently of the firmware image:
-
-1. Create an INI-like configuration file `my-moisture-sensor.cfg`:
-   ```ini
-   # WIFI SSID
-   WIFI_SSID=My WiFi Name
-   WIFI_PASS=My WiFi Password lol
-   
-   # MQTT configuration
-   # Note: Username, password and prefix are optional
-   MQTT_ADDR=192.0.2.1:1883
-   MQTT_USER=my mqtt username
-   MQTT_PASS=my mqtt password
-   MQTT_PRFX=my-prefix/my-sensor
-   
-   # Sleep intervals
-   SENSOR_SLEEP_SECS=600
-   SENSOR_ALERT_SECS=15
-   ```
-
-2. Then, copy the file into the userdata section on your device via
-   [`picotool`](https://github.com/raspberrypi/picotool):
-   ```sh
-   picotool load ./my-moisture-sensor.cfg -t bin -o 0x101FF000
-   ```
+## Supported Boards
+Currently supported boards are:
+- [Raspberry Pi Pico W](./rp2040-picow/README.md)
