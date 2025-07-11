@@ -10,7 +10,7 @@ pub struct Sensor {
     /// ADC driver
     adc: Adc<'static, Blocking>,
     /// Sensor ADC channel
-    channel: Channel<'static>,
+    sensor: Channel<'static>,
     /// Temperature ADC channel
     temperature: Channel<'static>,
 }
@@ -24,16 +24,16 @@ impl Sensor {
     {
         // Setup ADC driver and channel
         let adc = Adc::new_blocking(adc, Config::default());
-        let channel = Channel::new_pin(sensor_pin, Pull::None);
+        let sensor = Channel::new_pin(sensor_pin, Pull::None);
         let temperature = Channel::new_temp_sensor(temperature_pin);
-        Self { adc, channel, temperature }
+        Self { adc, sensor, temperature }
     }
 
     /// Gets estimated voltage and raw readout of the sensor pin
     pub fn read_pin(&mut self) -> (f32, u16) {
         // Note: This should never fail under normal conditions
-        let raw = self.adc.blocking_read(&mut self.channel).expect("failed to read sensor channel");
-        ((raw as f32 * 3.3) / 65536.0, raw)
+        let raw = self.adc.blocking_read(&mut self.sensor).expect("failed to read sensor channel");
+        ((raw as f32 * 3.3) / 4096.0, raw)
     }
 
     /// Gets estimated temperature in degrees celsius, and the raw readout of the temperature channel

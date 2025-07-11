@@ -12,7 +12,17 @@ the analogue pin, and publishes them via MQTT.
 ## Hardware and Wiring
 The firmware is designed to run on an original Raspberry Pi Pico W with an analogue capacitive moisture sensor with the
 signal pin connected to [`GP28`/`ADC2`](./RPi%20Pico%20Pinout.png). The firmware will read the analogue voltage on that
-pin and transmit the values via MQTT. 
+pin and transmit the values via MQTT.
+
+
+### Example Measurements
+Different moisture sensors will yield different values, so you need to do some testing to get a good estimate for your
+unit. Here are some example readings from my sensor:
+- Voltage when submerged into water: `0.5969971`, `0.5961914`, `0.5937744`
+- Voltage when in moist earth: `0.8668945`, `0.8612549`, `0.8540039`
+- Voltage when in dry earth: `1.1295411`, `1.1230956`, `1.1263183`
+- Voltage when dried: `1.1472656`, `1.1424316`, `1.1432372`
+- Voltage when disconnected: `0.1264893`, `0.1353516`, `0.1224609`
 
 
 ## Setup

@@ -105,26 +105,31 @@ async fn main(spawner: Spawner) {
     debug_println!("[info] established mqtt session");
 
     // Read sensor and chip temperature
-    // Note: The ADC draws some current, so ensure it is droped immediately
-    let ((sensor_voltage, sensor_raw), (sensor_temp, _)) = {
+    // Note: The ADC draws some current, so ensure it is dropped immediately
+    let ((sensor_voltage, sensor_raw), (sys_temp, _)) = {
         let mut sensor = Sensor::new(hw.ADC, hw.PIN_28, hw.ADC_TEMP_SENSOR);
         (sensor.read_pin(), sensor.read_temperature())
     };
 
-    // Publish raw sensor value
-    let sensor_raw = MqttBuffer::from_display(sensor_raw);
-    mqtt.publish("raw", &sensor_raw).await;
-    debug_println!("[info] published mqtt raw sensor value");
-
-    // Publish sensor voltage
-    let sensor_voltage = MqttBuffer::from_display(sensor_voltage);
-    mqtt.publish("voltage", &sensor_voltage).await;
-    debug_println!("[info] published sensor voltage");
-
-    // Publish chip temperature
-    let sensor_temp = MqttBuffer::from_display(sensor_temp);
-    mqtt.publish("temperature", &sensor_temp).await;
-    debug_println!("[info] published chip temperature");
+    // Scope the MQTT buffers due to stack size
+    {
+        // Publish raw sensor value
+        let sensor_raw_str = MqttBuffer::from_display(sensor_raw);
+        mqtt.publish("raw", &sensor_raw_str).await;
+        debug_println!("[info] published mqtt raw sensor value: {}", sensor_raw);
+    }
+    {
+        // Publish sensor voltage
+        let sensor_voltage_str = MqttBuffer::from_display(sensor_voltage);
+        mqtt.publish("voltage", &sensor_voltage_str).await;
+        debug_println!("[info] published sensor voltage: {}", sensor_voltage);
+    }
+    {
+        // Publish chip temperature
+        let sys_temp_str = MqttBuffer::from_display(sys_temp);
+        mqtt.publish("temperature", &sys_temp_str).await;
+        debug_println!("[info] published system temperature: {}", sys_temp);
+    }
 
     // Disconnect
     mqtt.disconnect().await;
