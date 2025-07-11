@@ -95,10 +95,6 @@ impl WatchdogController {
         // TODO: Turn off unneeded peripherals?
         //scb.set_sleepdeep() maybe?
 
-        // Keep the watchdog fed to not reboot prematurely
-        let wait_secs = u32::try_from(timeout.as_secs()).expect("timeout is too large");
-        self.deadline_secs.store(wait_secs, Ordering::SeqCst);
-
         // Wait the given duration
         // Note: Because the feeding interval is 75% of the watchdog interval, there is enough time to reset after the
         //  timeout expires.
