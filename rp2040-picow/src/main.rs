@@ -18,7 +18,6 @@ use crate::wifi::{Cyw43, Cyw43Config, Cyw43Session};
 use embassy_executor::Spawner;
 use embassy_rp::bind_interrupts;
 use embassy_rp::peripherals::PIO0;
-use embassy_rp::pio::InterruptHandler;
 use embassy_time::Duration;
 use static_cell::StaticCell;
 
@@ -27,7 +26,9 @@ pub const APP_TIMEOUT: Duration = Duration::from_secs(45);
 
 bind_interrupts!(struct Irqs {
     // PIO0 interrupt handler
-    PIO0_IRQ_0 => InterruptHandler<PIO0>;
+    PIO0_IRQ_0 => embassy_rp::pio::InterruptHandler<PIO0>;
+    // ADC channel interrupt handler
+    ADC_IRQ_FIFO => embassy_rp::adc::InterruptHandler;
 });
 
 #[embassy_executor::main]
@@ -105,30 +106,24 @@ async fn main(spawner: Spawner) {
     debug_println!("[info] established mqtt session");
 
     // Read sensor and chip temperature
-    // Note: The ADC draws some current, so ensure it is dropped immediately
-    let ((sensor_voltage, sensor_raw), (sys_temp, _)) = {
-        let mut sensor = Sensor::new(hw.ADC, hw.PIN_28, hw.ADC_TEMP_SENSOR);
-        (sensor.read_pin(), sensor.read_temperature())
-    };
+    // Note: The ADC draws some current, so ensure it is dropped asap
+    let mut sensor = Sensor::new(hw.ADC, Irqs, hw.DMA_CH1, hw.PIN_28, hw.ADC_TEMP_SENSOR);
+    let readings = sensor.read().await;
+    drop(sensor);
+    debug_println!("[info] read sensor values");
 
     // Scope the MQTT buffers due to stack size
     {
-        // Publish raw sensor value
-        let sensor_raw_str = MqttBuffer::from_display(sensor_raw);
-        mqtt.publish("raw", &sensor_raw_str).await;
-        debug_println!("[info] published mqtt raw sensor value: {}", sensor_raw);
-    }
-    {
         // Publish sensor voltage
-        let sensor_voltage_str = MqttBuffer::from_display(sensor_voltage);
-        mqtt.publish("voltage", &sensor_voltage_str).await;
-        debug_println!("[info] published sensor voltage: {}", sensor_voltage);
+        let sensor = MqttBuffer::from_display(readings.sensor);
+        mqtt.publish("voltage", &sensor).await;
+        debug_println!("[info] published sensor voltage: {}", readings.sensor);
     }
     {
         // Publish chip temperature
-        let sys_temp_str = MqttBuffer::from_display(sys_temp);
-        mqtt.publish("temperature", &sys_temp_str).await;
-        debug_println!("[info] published system temperature: {}", sys_temp);
+        let temperature_str = MqttBuffer::from_display(readings.temperature);
+        mqtt.publish("temperature", &temperature_str).await;
+        debug_println!("[info] published system temperature: {}", readings.temperature);
     }
 
     // Disconnect
