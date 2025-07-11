@@ -8,7 +8,7 @@
       "servertype": "external",
       "cwd": "${workspaceRoot}",
       "preLaunchTask": "${defaultBuildTask}",
-      "executable": "${workspaceFolder}/rp2040-picow/target/thumbv6m-none-eabi/debug/firmware",
+      "executable": "${workspaceFolder}/target/thumbv6m-none-eabi/debug/firmware",
       "gdbPath": "arm-none-eabi-gdb",
       "device": "RP2040",
       "gdbTarget": "debugsrv.keziah.de:3333",
