@@ -39,7 +39,7 @@ You will need the following prerequisites:
 ### Flash the Firmware
 To flash the firmware, simple execute the `picotool` with your firmware image of choice:
 ```sh
-picotool load -v ./firmware.elf
+picotool load -v ./firmware -t elf
 ```
 
 
