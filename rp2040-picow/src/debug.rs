@@ -3,7 +3,7 @@
 use crate::wifi::Cyw43Session;
 use core::sync::atomic::{AtomicU8, Ordering};
 use embassy_executor::Spawner;
-use embassy_time::{Duration, Instant, Timer};
+use embassy_time::{Duration, Ticker};
 
 /// Prints a line via semi-hosting for debug builds only
 #[macro_export]
@@ -77,8 +77,8 @@ async fn status_led_task(mode: &'static AtomicU8, radio: &'static Cyw43Session) 
     const BLINK_INTERVAL: Duration = Duration::from_millis(125);
 
     // Init the LED to a known state
+    let mut ticker = Ticker::every(BLINK_INTERVAL);
     let mut state = false;
-    let mut last_toggle = Instant::now();
     radio.set_led(state).await;
 
     // Toggle state if appropriate
@@ -87,18 +87,17 @@ async fn status_led_task(mode: &'static AtomicU8, radio: &'static Cyw43Session) 
         let wants_toggle = match mode.load(Ordering::SeqCst) {
             mode if mode == StatusLedMode::Off as u8 => state != false,
             mode if mode == StatusLedMode::On as u8 => state != true,
-            mode if mode == StatusLedMode::Blink as u8 => Instant::now() > last_toggle + BLINK_INTERVAL,
+            mode if mode == StatusLedMode::Blink as u8 => true,
             mode => unreachable!("invalid status led mode: {mode}"),
         };
 
         // Update state if appropriate
         if wants_toggle {
             state = !state;
-            last_toggle = Instant::now();
             radio.set_led(state).await;
         }
 
         // Sleep some time
-        Timer::after(BLINK_INTERVAL).await;
+        ticker.next().await;
     }
 }
