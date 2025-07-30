@@ -107,7 +107,7 @@ async fn main(spawner: Spawner) {
 
     // Read sensor and chip temperature
     // Note: The ADC draws some current, so ensure it is dropped asap
-    let mut sensor = Sensor::new(hw.ADC, Irqs, hw.DMA_CH1, hw.PIN_28, hw.ADC_TEMP_SENSOR);
+    let mut sensor = Sensor::new(hw.ADC, Irqs, hw.DMA_CH1, hw.PIN_27, hw.PIN_28, hw.ADC_TEMP_SENSOR);
     let readings = sensor.read().await;
     drop(sensor);
     debug_println!("[info] read sensor values");
