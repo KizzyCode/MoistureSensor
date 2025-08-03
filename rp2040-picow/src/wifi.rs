@@ -1,5 +1,6 @@
 //! Wifi magic
 
+use crate::Irqs;
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
 use cyw43::{Control, JoinOptions, PowerManagementMode, SpiBusCyw43, State};
@@ -7,12 +8,11 @@ use cyw43_firmware::{CYW43_43439A0, CYW43_43439A0_CLM};
 use cyw43_pio::{PioSpi, RM2_CLOCK_DIVIDER};
 use embassy_executor::Spawner;
 use embassy_net::{Stack, StackResources};
-use embassy_rp::Peripheral;
+use embassy_rp::Peri;
 use embassy_rp::gpio::{Level, Output, Pin};
-use embassy_rp::interrupt::typelevel::Binding;
 use embassy_rp::pac::ROSC;
 use embassy_rp::peripherals::{DMA_CH0, PIO0};
-use embassy_rp::pio::{Instance, InterruptHandler, Pio, PioPin};
+use embassy_rp::pio::{Pio, PioPin};
 use embassy_sync::blocking_mutex::raw::ThreadModeRawMutex;
 use embassy_sync::mutex::Mutex;
 use embassy_time::Timer;
@@ -56,32 +56,32 @@ impl SpiBusCyw43 for &mut Pio0Dma0Spi {
 pub struct Cyw43Config;
 impl Cyw43Config {
     /// Creates a config from the given PIO and associated IRQ handlers and DMA channel
-    pub fn new<IRQS>(pio: PIO0, irqs: IRQS, dma: DMA_CH0) -> Cyw43ConfigWithPio<IRQS>
-    where
-        IRQS: Binding<<<PIO0 as Peripheral>::P as Instance>::Interrupt, InterruptHandler<<PIO0 as Peripheral>::P>>,
-    {
+    pub fn new(pio: Peri<'static, PIO0>, irqs: Irqs, dma: Peri<'static, DMA_CH0>) -> Cyw43ConfigWithPio {
         Cyw43ConfigWithPio { pio, irqs, dma }
     }
 }
 
 /// CYW43 peripheral config
-pub struct Cyw43ConfigWithPio<IRQS> {
+pub struct Cyw43ConfigWithPio {
     /// The PIO peripheral
-    pio: PIO0,
+    pio: Peri<'static, PIO0>,
     /// The IRQ handlers
-    irqs: IRQS,
-    /// The
-    dma: DMA_CH0,
+    irqs: Irqs,
+    /// The DMA channel
+    dma: Peri<'static, DMA_CH0>,
 }
-impl<IRQS> Cyw43ConfigWithPio<IRQS> {
+impl Cyw43ConfigWithPio {
     /// Sets the power-select line and the chip-select, data and clock SPI lines
-    pub fn set_pins<P, S, D, C>(self, powerselect: P, select: S, data: D, clock: C) -> Cyw43
+    pub fn set_pins<P, S, D, C>(
+        self,
+        powerselect: Peri<'static, P>,
+        select: Peri<'static, S>,
+        data: Peri<'static, D>,
+        clock: Peri<'static, C>,
+    ) -> Cyw43
     where
-        IRQS: Binding<<<PIO0 as Peripheral>::P as Instance>::Interrupt, InterruptHandler<<PIO0 as Peripheral>::P>>,
-        P: Peripheral + 'static,
-        P::P: Pin,
-        S: Peripheral + 'static,
-        S::P: Pin,
+        P: Pin,
+        S: Pin,
         D: PioPin,
         C: PioPin,
     {
@@ -162,7 +162,7 @@ pub struct Cyw43Session {
 }
 impl Cyw43Session {
     /// Joins the given wifi network
-    pub async fn join(&self, config: &crate::Config) {
+    pub async fn join(&self, config: &crate::AppConfig) {
         let options = JoinOptions::new(config.WIFI_PASS.as_bytes());
         self.radio.lock().await.join(config.WIFI_SSID, options).await.expect("failed to join wifi network")
     }

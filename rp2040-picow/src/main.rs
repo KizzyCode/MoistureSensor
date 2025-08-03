@@ -9,7 +9,7 @@ mod sensor;
 mod watchdog;
 mod wifi;
 
-use crate::config::Config;
+use crate::config::AppConfig;
 use crate::debug::{StatusLed, StatusLedMode};
 use crate::mqtt::{MqttBuffer, MqttStack};
 use crate::sensor::Sensor;
@@ -17,12 +17,17 @@ use crate::watchdog::{Lifecycle, Watchdog};
 use crate::wifi::{Cyw43, Cyw43Config, Cyw43Session};
 use embassy_executor::Spawner;
 use embassy_rp::bind_interrupts;
+use embassy_rp::clocks::ClockConfig;
+use embassy_rp::config::Config;
 use embassy_rp::peripherals::PIO0;
 use embassy_time::Duration;
 use static_cell::StaticCell;
 
 /// The application timeout
 pub const APP_TIMEOUT: Duration = Duration::from_secs(45);
+
+/// The system frequency in Hz
+pub const SYSTEM_FREQ_HZ: u32 = 25_000_000;
 
 bind_interrupts!(struct Irqs {
     // PIO0 interrupt handler
@@ -42,8 +47,12 @@ async fn main(spawner: Spawner) {
     /// Static status LED control session
     static LED: StaticCell<StatusLed> = StaticCell::new();
 
+    // Perform strong underclocking
+    let mut hw_config = Config::default();
+    hw_config.clocks = ClockConfig::system_freq(SYSTEM_FREQ_HZ).expect("failed to build clock config");
+
     // Get peripherals and grab reset info before doing anything else
-    let hw = embassy_rp::init(Default::default());
+    let hw = embassy_rp::init(hw_config);
     let lifecycle_before_reset = Lifecycle::load();
     debug_println!("[info] lifecycle before reset: {:?}", lifecycle_before_reset);
 
@@ -54,7 +63,7 @@ async fn main(spawner: Spawner) {
     debug_println!("[info] watchdog initialized");
 
     // Load device config
-    let config = Config::load();
+    let config = AppConfig::load();
     debug_println!("[info] loaded config: {:?}", config);
 
     // Setup radio and init network stack

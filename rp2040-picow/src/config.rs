@@ -3,10 +3,10 @@
 use crate::debug_println;
 use embassy_time::Duration;
 
-/// Device config
+/// Application config
 #[derive(Debug, Clone, Copy)]
 #[allow(non_snake_case)]
-pub struct Config {
+pub struct AppConfig {
     /// WIFI SSID
     pub WIFI_SSID: &'static str,
     /// WIFI password
@@ -24,7 +24,7 @@ pub struct Config {
     /// The alert blinking duration if an error occurs
     pub SENSOR_ALERT_SECS: Duration,
 }
-impl Config {
+impl AppConfig {
     /// Loads the config from the flash memory
     pub fn load() -> Self {
         /// Default duration

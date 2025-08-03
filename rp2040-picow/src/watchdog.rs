@@ -4,6 +4,7 @@ use crate::debug_println;
 use core::sync::atomic::{AtomicU32, Ordering};
 use cortex_m::peripheral::SCB;
 use embassy_executor::Spawner;
+use embassy_rp::Peri;
 use embassy_rp::pac::WATCHDOG;
 use embassy_rp::peripherals::WATCHDOG;
 use embassy_time::{Duration, Instant, Timer};
@@ -41,7 +42,7 @@ impl Lifecycle {
 /// Watchdog wrapper
 pub struct Watchdog {
     /// Underlying watchdog peripheral
-    watchdog: Option<WATCHDOG>,
+    watchdog: Option<Peri<'static, WATCHDOG>>,
     /// Watchdog deadline in seconds
     deadline_secs: AtomicU32,
 }
@@ -50,7 +51,7 @@ impl Watchdog {
     pub const TIMEOUT: Duration = Duration::from_micros(0xFFFFFF / 2);
 
     /// Creates a new watchdog instance from the peripheral
-    pub const fn new(peripheral: WATCHDOG) -> Self {
+    pub const fn new(peripheral: Peri<'static, WATCHDOG>) -> Self {
         Self { watchdog: Some(peripheral), deadline_secs: AtomicU32::new(0) }
     }
 

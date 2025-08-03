@@ -1,10 +1,10 @@
 //! Moisture sensor handling
 
 use crate::Irqs;
-use embassy_rp::Peripheral;
 use embassy_rp::adc::{Adc, AdcPin, Async, Channel, Config};
 use embassy_rp::gpio::{Level, Output, Pin, Pull};
 use embassy_rp::peripherals::{ADC, ADC_TEMP_SENSOR};
+use embassy_rp::{Peri, PeripheralType};
 use embassy_time::{Duration, Timer};
 
 /// ~732 Hz sample rate (the lowest possible sample rate)
@@ -12,17 +12,23 @@ const SAMPLE_RATE: u16 = u16::MAX;
 /// Sample count to sample ~1.5s
 const SAMPLE_COUNT: usize = 1024;
 
+/// A sensor readout result
 pub struct SensorReadout {
+    /// The sensor value
     pub sensor: f64,
+    /// The temperature value
     pub temperature: f64,
 }
 
 /// The moisture sensor
-pub struct Sensor<D> {
+pub struct Sensor<D>
+where
+    D: embassy_rp::dma::Channel + PeripheralType + 'static,
+{
     /// ADC driver
     adc: Adc<'static, Async>,
     /// ADC DMA channel
-    dma: D,
+    dma: Peri<'static, D>,
     /// The power-select pin to power up the sensor
     powerselect: Output<'static>,
     /// ADC channels (sensor, temperature)
@@ -30,20 +36,23 @@ pub struct Sensor<D> {
 }
 impl<D> Sensor<D>
 where
-    D: Peripheral + 'static,
-    D::P: embassy_rp::dma::Channel,
+    D: embassy_rp::dma::Channel + PeripheralType + 'static,
 {
     /// The amount of time to wait to give the sensor enough time to power up
     const POWERUP_DURATION: Duration = Duration::from_millis(500);
 
     /// Creates a new sensor instance
-    pub fn new<P, S, T>(adc: ADC, irqs: Irqs, dma: D, powerselect: P, sensor: S, temperature: T) -> Self
+    pub fn new<P, S>(
+        adc: Peri<'static, ADC>,
+        irqs: Irqs,
+        dma: Peri<'static, D>,
+        powerselect: Peri<'static, P>,
+        sensor: Peri<'static, S>,
+        temperature: Peri<'static, ADC_TEMP_SENSOR>,
+    ) -> Self
     where
-        P: Peripheral + 'static,
-        P::P: Pin,
-        S: Peripheral + 'static,
-        S::P: AdcPin,
-        T: Peripheral<P = ADC_TEMP_SENSOR> + 'static,
+        P: Pin + 'static,
+        S: AdcPin + 'static,
     {
         // Setup ADC driver and channel
         let adc = Adc::new(adc, irqs, Config::default());
@@ -65,7 +74,7 @@ where
         // Note: Samples are stored interleaved, so double the capacity
         let mut samples = [0u16; SAMPLE_COUNT * 2];
         let result =
-            self.adc.read_many_multichannel(&mut self.channels, &mut samples, SAMPLE_RATE, &mut self.dma).await;
+            self.adc.read_many_multichannel(&mut self.channels, &mut samples, SAMPLE_RATE, self.dma.reborrow()).await;
 
         // Power down the sensor *first*, then check the sampling result
         // Note: This should never fail under normal conditions

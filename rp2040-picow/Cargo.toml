@@ -1,6 +1,6 @@
 [package]
 name = "moisturesensor-rp2040-picow"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 resolver = "2"
 authors = ["KizzyCode Software Labs./Keziah Biermann <development@kizzycode.de>"]
@@ -23,7 +23,7 @@ default = []
 [dependencies]
 embassy-executor = { version = "0.7.0", features = ["arch-cortex-m", "executor-thread", "task-arena-size-65536"] }
 embassy-net = { version = "0.7.0", features = ["tcp", "dhcpv4", "proto-ipv4"] }
-embassy-rp = { version = "0.4.0", features = ["unstable-pac", "time-driver", "critical-section-impl", "rp2040"] }
+embassy-rp = { version = "0.6.0", features = ["unstable-pac", "time-driver", "critical-section-impl", "rp2040"] }
 embassy-sync = { version = "0.7.0" }
 embassy-time = { version = "0.4.0" }
 
@@ -33,12 +33,12 @@ cortex-m-semihosting = { version = "0.5.0" }
 embedded-hal = { version = "1.0.0" }
 embedded-io-async = { version = "0.6.1" }
 embedded-nal-async = { version = "0.8.0" }
-portable-atomic = { version = "1.5.0", features = ["critical-section"] }
-static_cell = { version = "2.1.0" }
+portable-atomic = { version = "1.11.1", features = ["critical-section"] }
+static_cell = { version = "2.1.1" }
 
-cyw43 = { version = "0.3.0" }
+cyw43 = { version = "0.4.0" }
 cyw43-firmware = { version = "0.1.0", features = ["wifi"] }
-cyw43-pio = { version = "0.4.0" }
+cyw43-pio = { version = "0.5.1" }
 mqtt-tiny = { version = "0.4.0", features = ["heapless"] }
 
 

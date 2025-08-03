@@ -1,7 +1,7 @@
 //! MQTT client
 
 use crate::APP_TIMEOUT;
-use crate::config::Config;
+use crate::config::AppConfig;
 use core::fmt::Display;
 use core::net::SocketAddr;
 use core::ops::Deref;
@@ -100,7 +100,7 @@ impl MqttStack {
     }
 
     /// Creates an MQTT client, but does not connect yet
-    pub fn init(&mut self, config: &Config) -> MqttClient<'_> {
+    pub fn init(&mut self, config: &AppConfig) -> MqttClient<'_> {
         // Create the TCP client and try to parse the MQTT address
         let tcp_client = TcpClient::new(self.network, &self.tcp_state);
         let address: SocketAddr = config.MQTT_ADDR.parse().expect("invalid mqtt server address");
@@ -115,7 +115,7 @@ pub struct MqttClient<'a> {
     /// MQTT server address
     address: SocketAddr,
     /// [`Config`]
-    config: Config,
+    config: AppConfig,
 }
 impl<'a> MqttClient<'a> {
     /// Connects to the MQTT server
@@ -128,7 +128,7 @@ impl<'a> MqttClient<'a> {
 
 /// A buffered, iterator-compatible TCP connection adapter
 pub struct MqttTcpConnection<'a> {
-    config: Config,
+    config: AppConfig,
     /// The underlying TCP connection
     tcp: TcpConnection<'a, 1, BUF_SIZE, BUF_SIZE>,
     /// A buffer to hold read data

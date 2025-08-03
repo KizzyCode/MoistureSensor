@@ -1,6 +1,6 @@
 //! Panic handler and after-panic signalizer
 
-use crate::config::Config;
+use crate::config::AppConfig;
 use crate::debug::{StatusLedMode, StatusLedSession};
 use crate::debug_println;
 use crate::watchdog::{Lifecycle, WatchdogController};
@@ -9,7 +9,7 @@ use cortex_m::asm;
 use cortex_m::peripheral::SCB;
 
 /// Graceful after-panic handler to signalize the panic to the user
-pub async fn after_panic(config: &Config, watchdog: &WatchdogController, led: &StatusLedSession) -> ! {
+pub async fn after_panic(config: &AppConfig, watchdog: &WatchdogController, led: &StatusLedSession) -> ! {
     // After this handler, we want to enter the normal cycle again
     Lifecycle::store(Lifecycle::DEEPSLEEP);
     debug_println!("[info] executing after-panic task");
