@@ -238,6 +238,7 @@ async fn watchdog_task(deadline_secs: &'static AtomicU32, mut watchdog: embassy_
 
 /// RTC interrupt handler
 #[interrupt]
+#[allow(non_snake_case)]
 fn RTC_IRQ() {
     // The RTC alert fired
     debug_println!("[info] rtc interrupt fired");
