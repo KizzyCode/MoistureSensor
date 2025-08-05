@@ -106,7 +106,7 @@ impl WatchdogController {
         self.deadline_secs.store(deadline_secs, Ordering::SeqCst);
     }
 
-    /// Feeds the watchdog for the given duration and performs a graceful reset via [`SCB::sys_reset`] afterwards
+    /// Feeds the watchdog and performs a light-sleep for the given duration, then performs a graceful reset
     pub fn reset_after(self, rtc: Peri<'static, RTC>, mut scb: SCB, timeout: Duration) -> ! {
         /// The watchdog feed interval in seconds
         const FEED_INTERVAL_SECS: u8 = Watchdog::FEED_INTERVAL.as_secs() as u8;
