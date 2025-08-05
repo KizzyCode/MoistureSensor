@@ -15,6 +15,7 @@ use crate::mqtt::{MqttBuffer, MqttStack};
 use crate::sensor::Sensor;
 use crate::watchdog::{Lifecycle, Watchdog};
 use crate::wifi::{Cyw43, Cyw43Config, Cyw43Session};
+use cortex_m::Peripherals;
 use embassy_executor::Spawner;
 use embassy_rp::bind_interrupts;
 use embassy_rp::clocks::ClockConfig;
@@ -25,9 +26,8 @@ use static_cell::StaticCell;
 
 /// The application timeout
 pub const APP_TIMEOUT: Duration = Duration::from_secs(45);
-
 /// The system frequency in Hz
-pub const SYSTEM_FREQ_HZ: u32 = 25_000_000;
+pub const SYSTEM_FREQ_HZ: u32 = 30_000_000;
 
 bind_interrupts!(struct Irqs {
     // PIO0 interrupt handler
@@ -47,12 +47,13 @@ async fn main(spawner: Spawner) {
     /// Static status LED control session
     static LED: StaticCell<StatusLed> = StaticCell::new();
 
-    // Perform strong underclocking
+    // Setup device
     let mut hw_config = Config::default();
     hw_config.clocks = ClockConfig::system_freq(SYSTEM_FREQ_HZ).expect("failed to build clock config");
-
-    // Get peripherals and grab reset info before doing anything else
     let hw = embassy_rp::init(hw_config);
+
+    // Get peripherals and take reset info before doing anything else
+    let peripherals = Peripherals::take().expect("failed to take peripherals");
     let lifecycle_before_reset = Lifecycle::load();
     debug_println!("[info] lifecycle before reset: {:?}", lifecycle_before_reset);
 
@@ -79,9 +80,9 @@ async fn main(spawner: Spawner) {
     let led = led.start(&spawner);
 
     // We now have everything set up to divert to the after-panic handler if appropriate
-    let true = matches!(lifecycle_before_reset, Some(Lifecycle::DEEPSLEEP)) else {
+    let true = matches!(lifecycle_before_reset, Some(Lifecycle::LIGHTSLEEP)) else {
         // Apparently the previous app has not stopped gracefully
-        panic::after_panic(&config, &watchdog, &led).await;
+        panic::after_panic(&config, &led, &watchdog).await;
     };
 
     //
@@ -146,7 +147,7 @@ async fn main(spawner: Spawner) {
     //
     // Sleep and perform reset
     //
-    Lifecycle::store(Lifecycle::DEEPSLEEP);
+    Lifecycle::store(Lifecycle::LIGHTSLEEP);
     debug_println!("[info] entering sleep");
-    watchdog.reset_after(config.SENSOR_SLEEP_SECS).await;
+    watchdog.reset_after(hw.RTC, peripherals.SCB, config.SENSOR_SLEEP_SECS);
 }

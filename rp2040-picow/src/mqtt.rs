@@ -149,7 +149,7 @@ impl<'a> MqttTcpConnection<'a> {
         }
 
         // Send connect packet and await/validate connack packet
-        self.send(connect).await;
+        self.send(connect, true).await;
         let connack = self.recv::<Connack>().await;
         match connack.return_code() {
             0 => MqttSession { connection: self },
@@ -158,14 +158,17 @@ impl<'a> MqttTcpConnection<'a> {
     }
 
     /// Sends an MQTT packet
-    async fn send<Packet>(&mut self, packet: Packet)
+    async fn send<Packet>(&mut self, packet: Packet, flush: bool)
     where
         Packet: IntoIterator<Item = u8>,
     {
         // Serialize and send the given packet
         let packet: MqttBuffer = packet.into_iter().collect();
         self.tcp.write_all(&packet).await.expect("failed to write mqtt packet");
-        self.tcp.flush().await.expect("failed to write mqtt packet");
+        if flush {
+            // Flush packet if we are waiting for an immediate answer
+            self.tcp.flush().await.expect("failed to write mqtt packet");
+        }
     }
 
     /// Receives an MQTT packet
@@ -221,13 +224,13 @@ impl MqttSession<'_> {
         // Publish message
         // Note: QoS 0 does not expect a puback message
         let publish = Publish::new(&topic, payload, false).expect("failed to assemble mqtt publish packet");
-        self.connection.send(publish).await;
+        self.connection.send(publish, false).await;
     }
 
     /// Terminates the MQTT session
     pub async fn disconnect(mut self) {
         // Send a disconnect packet to terminate the MQTT session
         let disconnect = Disconnect::new();
-        self.connection.send(disconnect).await;
+        self.connection.send(disconnect, true).await;
     }
 }

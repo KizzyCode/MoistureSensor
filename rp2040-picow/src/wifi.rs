@@ -126,13 +126,13 @@ impl Cyw43 {
         spawner.must_spawn(cyw43_session_task(&self.stop, runner));
 
         // Load firmware and set power management
+        // Note: Retries due power-saving-induced connectivity problems have shown to be more costly than just using
+        //  higher-power modes
         radio.init(CYW43_43439A0_CLM).await;
-        radio.set_power_management(PowerManagementMode::PowerSave).await;
+        radio.set_power_management(PowerManagementMode::Performance).await;
 
         // Prepare network stack and generate random seed
         let netconfig = embassy_net::Config::dhcpv4(Default::default());
-
-        // Generate network stack seed
         let mut random_seed = 0;
         for shl in 0..64 {
             // Collect 64 sufficiently random bits
