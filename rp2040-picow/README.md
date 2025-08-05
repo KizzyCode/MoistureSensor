@@ -11,8 +11,9 @@ the analogue pin, and publishes them via MQTT.
 
 ## Hardware and Wiring
 The firmware is designed to run on an original Raspberry Pi Pico W with an analogue capacitive moisture sensor with the
-signal pin connected to [`GP28`/`ADC2`](./RPi%20Pico%20Pinout.png). The firmware will read the analogue voltage on that
-pin and transmit the values via MQTT.
+3.3v pin connected to [`GP27`](./RPi%20Pico%20Pinout.png), and the signal pin connected to
+[`GP28`](./RPi%20Pico%20Pinout.png). The firmware will read the analogue voltage on that pin and transmit the values via
+MQTT.
 
 
 ### Example Measurements
@@ -58,9 +59,8 @@ The sensor needs a network and MQTT configuration, which has to be deployed inde
    MQTT_PASS=my optional mqtt password
    MQTT_PRFX=my-optional-mqtt-prefix/
    
-   # Sleep intervals
+   # Sleep interval
    SENSOR_SLEEP_SECS=600
-   SENSOR_ALERT_SECS=15
    ```
 
 2. Copy the file into the userdata section on your device via [`picotool`](https://github.com/raspberrypi/picotool):
