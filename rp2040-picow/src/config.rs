@@ -21,8 +21,6 @@ pub struct AppConfig {
     pub MQTT_PRFX: &'static str,
     /// The sleep duration between to measurement cycles
     pub SENSOR_SLEEP_SECS: Duration,
-    /// The alert blinking duration if an error occurs
-    pub SENSOR_ALERT_SECS: Duration,
 }
 impl AppConfig {
     /// Loads the config from the flash memory
@@ -42,7 +40,6 @@ impl AppConfig {
         let mut mqtt_pass = None;
         let mut mqtt_prfx = None;
         let mut sensor_sleep_secs = None;
-        let mut sensor_alert_secs = None;
         'read_lines: for line in USERDATA.split(|byte| *byte == b'\n') {
             // Parse line as INI line
             let Ok(line) = str::from_utf8(line) else {
@@ -64,7 +61,6 @@ impl AppConfig {
                 "MQTT_PASS" => Self::read_str(value, &mut mqtt_pass),
                 "MQTT_PRFX" => Self::read_str(value, &mut mqtt_prfx),
                 "SENSOR_SLEEP_SECS" => Self::read_secs(value, &mut sensor_sleep_secs),
-                "SENSOR_ALERT_SECS" => Self::read_secs(value, &mut sensor_alert_secs),
                 // Unknown INI line; skip it
                 _ => continue 'read_lines,
             };
@@ -79,7 +75,6 @@ impl AppConfig {
             MQTT_PASS: Self::unwrap_or_default("MQTT_PASS", mqtt_pass, ""),
             MQTT_PRFX: Self::unwrap_or_default("MQTT_PRFX", mqtt_prfx, ""),
             SENSOR_SLEEP_SECS: Self::unwrap_or_default("SENSOR_SLEEP_SECS", sensor_sleep_secs, DEFAULT_DURATION),
-            SENSOR_ALERT_SECS: Self::unwrap_or_default("SENSOR_ALERT_SECS", sensor_alert_secs, DEFAULT_DURATION),
         }
     }
 

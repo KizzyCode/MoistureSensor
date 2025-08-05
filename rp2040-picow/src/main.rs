@@ -25,9 +25,7 @@ use embassy_time::Duration;
 use static_cell::StaticCell;
 
 /// The application timeout
-pub const APP_TIMEOUT: Duration = Duration::from_secs(45);
-/// The system frequency in Hz
-pub const SYSTEM_FREQ_HZ: u32 = 30_000_000;
+const APP_TIMEOUT: Duration = Duration::from_secs(45);
 
 bind_interrupts!(struct Irqs {
     // PIO0 interrupt handler
@@ -38,6 +36,9 @@ bind_interrupts!(struct Irqs {
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
+    /// The system frequency in Hz
+    const SYSTEM_FREQ_HZ: u32 = 30_000_000;
+
     /// Static watchdog peripheral
     static WATCHDOG: StaticCell<Watchdog> = StaticCell::new();
     /// Static CYW43 peripheral handle
@@ -82,7 +83,7 @@ async fn main(spawner: Spawner) {
     // We now have everything set up to divert to the after-panic handler if appropriate
     let true = matches!(lifecycle_before_reset, Some(Lifecycle::LIGHTSLEEP)) else {
         // Apparently the previous app has not stopped gracefully
-        panic::after_panic(&config, &led, &watchdog).await;
+        panic::after_panic(&led, &watchdog).await;
     };
 
     //
