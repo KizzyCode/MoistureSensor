@@ -1,0 +1,55 @@
+[package]
+name = "moisturesensor-rp2350-pico2w"
+version = "0.4.1"
+edition = "2024"
+resolver = "2"
+authors = ["KizzyCode Software Labs./Keziah Biermann <development@kizzycode.de>"]
+keywords = []
+categories = []
+description = "MQTT moisture sensor (Raspberry Pi Pico 2 W)"
+license = "BSD-2-Clause OR MIT"
+readme = "README.md"
+
+
+[[bin]]
+name = "firmware"
+path = "src/main.rs"
+
+
+[features]
+default = []
+
+
+[dependencies]
+embassy-executor = { version = "0.8.0", features = ["arch-cortex-m", "executor-thread"] }
+embassy-net = { version = "0.7.0", features = ["tcp", "dhcpv4", "proto-ipv4"] }
+embassy-rp = { version = "0.7.0", features = ["unstable-pac", "time-driver", "critical-section-impl", "rp235xa", "imagedef-secure-exe", "binary-info", "boot2-w25q080"] }
+embassy-sync = { version = "0.7.0" }
+embassy-time = { version = "0.4.0" }
+
+cortex-m = { version = "0.7.6", features = ["inline-asm"] }
+cortex-m-rt = { version = "0.7.0" }
+cortex-m-semihosting = { version = "0.5.0" }
+critical-section = { version = "1.2.0" }
+embedded-hal = { version = "1.0.0" }
+embedded-io-async = { version = "0.6.1" }
+embedded-nal-async = { version = "0.8.0" }
+portable-atomic = { version = "1.11.1", features = ["critical-section"] }
+static_cell = { version = "2.1.1" }
+
+cyw43 = { version = "0.4.0" }
+cyw43-firmware = { version = "0.1.0", features = ["wifi"] }
+cyw43-pio = { version = "0.6.0" }
+mqtt-tiny = { version = "0.4.0", features = ["heapless"] }
+
+
+[profile.dev]
+overflow-checks = true
+opt-level = 3
+debug = 2
+
+[profile.release]
+debug = 0
+overflow-checks = true
+opt-level = 3
+strip = "symbols"

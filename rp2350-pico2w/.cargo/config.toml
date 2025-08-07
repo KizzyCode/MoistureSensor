@@ -1,0 +1,10 @@
+[build]
+target = "thumbv8m.main-none-eabihf"
+
+[target.thumbv8m.main-none-eabihf]
+rustflags = [
+    "-C", "linker=flip-link",
+    "-C", "link-arg=--nmagic",
+    "-C", "link-arg=-Tlink.x",
+    "-C", "no-vectorize-loops",
+]

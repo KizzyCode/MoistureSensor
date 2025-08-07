@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cargo",
+			"command": "build",
+			"problemMatcher": [
+				"$rustc"
+			],
+			"label": "rust: cargo build",
+			"group": {
+                "kind": "build",
+                "isDefault": true
+            },
+			"presentation": {
+				"reveal": "never",
+				"revealProblems": "never",
+			}
+		}
+	]
+}

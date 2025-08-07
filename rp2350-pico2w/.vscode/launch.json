@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "cortex-debug",
+      "request": "launch",
+      "name": "remote-openocd (rp2350-picow)",
+      "servertype": "external",
+      "cwd": "${workspaceRoot}",
+      "preLaunchTask": "${defaultBuildTask}",
+      "executable": "${workspaceFolder}/target/thumbv8m.main-none-eabihf/debug/firmware",
+      "gdbPath": "arm-none-eabi-gdb",
+      "device": "RP2350",
+      "gdbTarget": "debugsrv.keziah.de:3333",
+      "svdFile": "${workspaceRoot}/.vscode/rp2350.svd",
+      "internalConsoleOptions": "openOnSessionStart",
+      "runToEntryPoint": "main",
+      "preLaunchCommands": [
+        "monitor arm semihosting enable",
+        "monitor arm semihosting_fileio enable"
+      ],
+      "postRestartCommands": [
+        "break main",
+        "continue"
+      ]
+    },
+  ]
+}
