@@ -17,7 +17,7 @@ pub async fn after_panic(led: &StatusLedSession) -> ! {
     Lifecycle::store(Lifecycle::LIGHTSLEEP);
     debug_println!("[info] executing after-panic task");
 
-    // Blink the LED to signal the panic; use 1/3 of the app-timeout as reference
+    // Blink the LED to signal the panic
     led.set(StatusLedMode::Blink);
     Timer::after(PANIC_DURATION).await;
 
