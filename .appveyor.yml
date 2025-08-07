@@ -9,6 +9,8 @@ environment:
   matrix:
     - FIRMWARE: rp2040-picow
       TARGET: thumbv6m-none-eabi
+    - FIRMWARE: rp2350-pico2w
+      TARGET: thumbv8m.main-none-eabihf
 
 
 # Fail fast if one job in the matrix fails

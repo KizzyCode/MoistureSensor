@@ -12,3 +12,4 @@ analogue pin, and publishes them via MQTT.
 ## Supported Boards
 Currently supported boards are:
 - [Raspberry Pi Pico W](./rp2040-picow/README.md)
+- [Raspberry Pi Pico 2 W](./rp2350-pico2w/README.md)

@@ -40,7 +40,7 @@ You will need the following prerequisites:
 ### Flash the Firmware
 To flash the firmware, simple execute the `picotool` with your firmware image of choice:
 ```sh
-picotool load -v ./firmware -t elf
+picotool load -v ./firmware-rp2040-picow -t elf
 ```
 
 

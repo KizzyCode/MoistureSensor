@@ -11,8 +11,8 @@ the analogue pin, and publishes them via MQTT.
 
 ## Hardware and Wiring
 The firmware is designed to run on an original Raspberry Pi Pico 2 W with an analogue capacitive moisture sensor with the
-3.3v pin connected to [`GP27`](./RPi%20Pico%202W%20Pinout.png), and the signal pin connected to
-[`GP28`](./RPi%20Pico%202W%20Pinout.png). The firmware will read the analogue voltage on that pin and transmit the
+3.3v pin connected to [`GP27`](./RPi%20Pico%202%20W%20Pinout.png), and the signal pin connected to
+[`GP28`](./RPi%20Pico%202%20W%20Pinout.png). The firmware will read the analogue voltage on that pin and transmit the
 values via MQTT.
 
 
@@ -40,7 +40,7 @@ You will need the following prerequisites:
 ### Flash the Firmware
 To flash the firmware, simple execute the `picotool` with your firmware image of choice:
 ```sh
-picotool load -v ./firmware -t elf
+picotool load -v ./firmware-rp2350-pico2w -t elf
 ```
 
 
