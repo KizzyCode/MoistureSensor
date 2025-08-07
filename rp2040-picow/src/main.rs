@@ -83,7 +83,7 @@ async fn main(spawner: Spawner) {
     // We now have everything set up to divert to the after-panic handler if appropriate
     let true = matches!(lifecycle_before_reset, Some(Lifecycle::LIGHTSLEEP)) else {
         // Apparently the previous app has not stopped gracefully
-        panic::after_panic(&led, &watchdog).await;
+        panic::after_panic(&led).await;
     };
 
     //

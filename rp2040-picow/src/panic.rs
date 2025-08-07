@@ -2,14 +2,14 @@
 
 use crate::debug::{StatusLedMode, StatusLedSession};
 use crate::debug_println;
-use crate::watchdog::{Lifecycle, WatchdogController};
+use crate::watchdog::Lifecycle;
 use core::panic::PanicInfo;
 use cortex_m::asm;
 use cortex_m::peripheral::SCB;
 use embassy_time::{Duration, Timer};
 
 /// Graceful after-panic handler to signalize the panic to the user
-pub async fn after_panic(led: &StatusLedSession, watchdog: &WatchdogController) -> ! {
+pub async fn after_panic(led: &StatusLedSession) -> ! {
     /// The post-panic signal duration
     const PANIC_DURATION: Duration = Duration::from_secs(5);
 
@@ -23,7 +23,7 @@ pub async fn after_panic(led: &StatusLedSession, watchdog: &WatchdogController) 
 
     // Perform reset
     debug_println!("[info] performing graceful post-panic reset");
-    watchdog.reset();
+    SCB::sys_reset();
 }
 
 #[panic_handler]
@@ -32,16 +32,8 @@ fn panic(info: &PanicInfo) -> ! {
     cortex_m::interrupt::disable();
     debug_println!("{}", info);
 
-    // Check the lifecycle and reset accordingly
-    match Lifecycle::load() {
-        Some(Lifecycle::WATCHDOG) => {
-            // We cannot really handle these resets gracefully
-            asm::bkpt();
-            asm::udf();
-        }
-        _ => {
-            // Do a graceful reset
-            SCB::sys_reset();
-        }
-    }
+    // Crash and wait until the watchdog kills us
+    // Note: If the watchdog is not yet running, we crash so early that a normal reset wouldn't help either.
+    asm::bkpt();
+    asm::udf();
 }

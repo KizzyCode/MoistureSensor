@@ -119,6 +119,7 @@ impl WatchdogController {
         const TIMEOUT_COUNTER: u32 = 0xFFFFFF;
 
         // Configure the watchdog so it resets everything incl ROSC/XOSC, and disable all interrupts except RTC
+        // Note: This is an additional safety measurement as we do some funny stuff with our clocks during sleep
         PSM.wdsel().write_value(Wdsel(0x0001ffff));
         unsafe { (*NVIC::PTR).icer[0].write(u32::MAX) };
         unsafe { NVIC::unmask(Interrupt::RTC_IRQ) };
@@ -181,19 +182,9 @@ impl WatchdogController {
             asm::wfi();
         }
 
-        // Perform a graceful reset
-        debug_println!("[info] performing graceful reset");
-        self.reset();
-    }
-
-    /// Performs an immediate, graceful full reset via the watchdog
-    pub fn reset(&self) -> ! {
-        // Configure the watchdog so it resets everything, including ROSC/XOSC
-        // Note: This is an additional safety measurement as we do some funny stuff with our clocks during sleep
-        PSM.wdsel().write_value(Wdsel(0x0001ffff));
-
         // Perform reset via watchdog (this also resets the clocks)
         // Note: This should be sound as the existence of `self` implies the watchdog is running
+        debug_println!("[info] performing graceful reset");
         WATCHDOG.ctrl().write(|w| w.set_trigger(true));
         loop {
             // Wait for the reset
