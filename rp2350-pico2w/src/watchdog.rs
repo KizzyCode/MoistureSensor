@@ -15,7 +15,6 @@ use embassy_time::{Duration, Instant, Timer};
 /// Helper macro to write registers with special requirements
 macro_rules! write_reg {
     (powman: $register:expr => |$name:ident| $write:expr) => {{
-        // FIXME: should maybe be modify?
         $register.modify(|$name| {
             // Provide the safety password
             $name.0 = 0x5AFE0000 | ($name.0 & 0x0000FFFF);
