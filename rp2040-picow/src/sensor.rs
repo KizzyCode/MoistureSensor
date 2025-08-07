@@ -90,10 +90,6 @@ where
         // Note: According to chapter 4.9.5. Temperature Sensor in RP2040 datasheet
         let temperature_raw = (temperature_total as f64) / (SAMPLE_COUNT as f64);
         let temperature = 27.0 - (temperature_raw * 3.3 / 4096.0 - 0.706) / 0.001721;
-        let temperature = match temperature {
-            _ if temperature < 0.0 => temperature - 0.05,
-            _ => temperature + 0.05,
-        };
 
         // Compute sensor voltage
         let sensor_raw = (sensor_total as f64) / (SAMPLE_COUNT as f64);
