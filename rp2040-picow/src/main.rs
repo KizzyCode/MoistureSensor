@@ -27,6 +27,7 @@ use static_cell::StaticCell;
 /// The application timeout
 const APP_TIMEOUT: Duration = Duration::from_secs(45);
 
+// Bind required interrupt handlers
 bind_interrupts!(struct Irqs {
     // PIO0 interrupt handler
     PIO0_IRQ_0 => embassy_rp::pio::InterruptHandler<PIO0>;
